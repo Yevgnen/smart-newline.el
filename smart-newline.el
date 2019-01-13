@@ -82,12 +82,26 @@
   (smart-newline/match-like-closing-of-block
    (smart-newline/get-forward-line-string 1)))
 
+(defun smart-newline/newline-and-indent-general ()
+  (reindent-then-newline-and-indent))
+
+(defun smart-newline/newline-and-indent-python ()
+  (newline-and-indent))
+
 (defun smart-newline/newline-and-indent (pattern-name)
   (if smart-newline/debug
       (princ (format "[newline-and-indent] pattern: %s\n" pattern-name)))
-  (reindent-then-newline-and-indent))
+  (if (derived-mode-p 'python-mode)
+      (smart-newline/newline-and-indent-python)
+    (smart-newline/newline-and-indent-general)))
 
-(defun smart-newline/open-line-between (pattern-name)
+(defun smart-newline/calculate-python-spaces ()
+  (save-excursion
+    (beginning-of-line)
+    (back-to-indentation)
+    (current-column)))
+
+(defun smart-newline/open-line-between-general ()
   (if smart-newline/debug
       (princ (format "[open-line-between] pattern: %s\n" pattern-name)))
   (indent-according-to-mode)
@@ -97,6 +111,24 @@
     (forward-line)
     (indent-according-to-mode)
     (forward-line -1)))
+
+(defun smart-newline/open-line-between-python ()
+  (let ((spaces (smart-newline/calculate-python-spaces)))
+    (if (not (or (smart-newline/exist-string-before-cursor-p)
+                 (smart-newline/exist-string-after-cursor-p)))
+        (newline)
+      (back-to-indentation)
+      (newline)
+      (insert (make-string spaces ? )))
+    (forward-line -1)
+    (end-of-line)))
+
+(defun smart-newline/open-line-between (pattern-name)
+  (if smart-newline/debug
+      (princ (format "[open-line-between] pattern: %s\n" pattern-name)))
+  (if (derived-mode-p 'python-mode)
+      (smart-newline/open-line-between-python)
+    (smart-newline/open-line-between-general)))
 
 ;;;###autoload
 (defun smart-newline ()
