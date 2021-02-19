@@ -97,7 +97,6 @@
 
 (defun smart-newline/calculate-python-spaces ()
   (save-excursion
-    (beginning-of-line)
     (back-to-indentation)
     (current-column)))
 
