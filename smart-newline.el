@@ -102,7 +102,7 @@
 
 (defun smart-newline/open-line-between-general ()
   (if smart-newline/debug
-      (princ (format "[open-line-between] pattern: %s\n" pattern-name)))
+      (princ (format "[open-line-between/general] pattern: %s\n" pattern-name)))
   (indent-according-to-mode)
   (open-line 1)
   (indent-according-to-mode)
@@ -112,6 +112,8 @@
     (forward-line -1)))
 
 (defun smart-newline/open-line-between-python ()
+    (if smart-newline/debug
+      (princ (format "[open-line-between/python] pattern: %s\n" pattern-name)))
   (let ((spaces (smart-newline/calculate-python-spaces)))
     (if (not (or (smart-newline/exist-string-before-cursor-p)
                  (smart-newline/exist-string-after-cursor-p)))
